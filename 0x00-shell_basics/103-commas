@@ -1,2 +1,2 @@
 #!/bin/bash
-echo -n "./, ../," && ls -Ap | grep -vE '^\./?$' | sort | paste -sd, -
+echo -n "./, ../," | ls -Ap | grep -vE '^\./?$' | sort | paste -sd, -
