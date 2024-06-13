@@ -1,2 +1,2 @@
 #!/bin/bash
-echo "./, ../, $(ls-a1p | grep -vE '^\./?$' | sort | tr '\n' ',' | sed 's/,$//')"
+echo -n "./, ../," && ls -Ap | grep -vE '^\./?$' | sort | paste -sd, -
