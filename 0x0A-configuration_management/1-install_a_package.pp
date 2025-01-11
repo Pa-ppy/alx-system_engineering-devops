@@ -1,16 +1,12 @@
-# This manifest installs Flask version 2.1.0 in a virtual environment.
-package { 'python3-venv':
+# This manifest installs Flask globally using the APT package manager.
+
+package { 'python3-flask':
   ensure => installed,
 }
 
-exec { 'create_virtualenv':
-  command => '/usr/bin/python3 -m venv /opt/myenv',
-  creates => '/opt/myenv',
-  require => Package['python3-venv'],
-}
-
-exec { 'install_flask':
-  command => '/opt/myenv/bin/pip install Flask==2.1.0',
-  path    => ['/usr/bin', '/bin', '/opt/myenv/bin'],
-  require => Exec['create_virtualenv'],
+exec { 'verify_flask_installation':
+  command => '/usr/bin/flask --version',
+  path    => ['/usr/bin', '/bin'],
+  onlyif  => '/usr/bin/which flask',
+  require => Package['python3-flask'],
 }
