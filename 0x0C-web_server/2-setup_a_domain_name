@@ -1,1 +1,4 @@
+#!/usr/bin/env bash
+# This script sets up a domain name configuration for the server.
+
 codealchemist.tech
