@@ -5,7 +5,7 @@
 apt-get update -y && apt-get install -y nginx
 
 # Create a custom 404 page
-echo "Ceci n'est pas une page" > /usr/share/nginx/html/custom_404.html
+echo "Ceci n'est pas une page" > /var/www/html/custom_404.html
 
 # Update the Nginx server block to use the custom 404 page
 sed -i '/server {/a \\terror_page 404 /custom_404.txt;' /etc/nginx/sites-available/default
