@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Start Apache and ensure the "Hello ALX" page is served
+service apache2 start
+echo "Hello ALX" > /var/www/html/index.html
