@@ -10,7 +10,9 @@ apt-get -y update
 apt-get -y install haproxy=2.0.*
 
 # Configure HAProxy with roundrobin balancing
-cat <<EOL >> /etc/haproxy/haproxy.cfg
+echo "ENABLED=1" | sudo tee -a /etc/default/haproxy
+
+cat <<EOT >> /etc/haproxy/haproxy.cfg
 
 frontend http
     bind *:80
@@ -19,9 +21,9 @@ frontend http
 
 backend web-backend
     balance roundrobin
-    server web-01 100.24.72.31:80 check
-    server web-02 54.145.82.172:80 check
-EOL
+    server 806443-web-01 100.24.72.31:80 check
+    server 806443-web-02 54.145.82.172:80 check
+EOT
 
 # Restart HAProxy to apply the new configuration
 service haproxy restart
