@@ -1,36 +1,26 @@
 # 2-puppet_custom_http_response_header.pp
 # This Puppet script configures Nginx with a custom HTTP header X-Served-By
 
-class nginx_custom_header {
-    package { 'nginx':
-        ensure => installed,
-    }
-
-    service { 'nginx':
-        ensure => running,
-        enable => true,
-    }
-
-    file { '/etc/nginx/sites-available/default':
-        ensure  => file,
-        content => template('nginx/default.erb'),
-        notify  => Service['nginx'],
-    }
-
-    file { '/etc/nginx/templates/default.erb':
-        ensure  => file,
-        content => @("EOF")
-server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-    root /var/www/html;
-    index index.html index.htm;
-    server_name _;
-    location / {
-        add_header X-Served-By $hostname;
-    }
+exec {'update':
+  provider => shell,
+  command  => 'sudo apt-get -y update',
+  before   => Exec['install Nginx'],
 }
-| EOF
-        notify  => Service['nginx'],
-    }
+
+exec {'install Nginx':
+  provider => shell,
+  command  => 'sudo apt-get -y install nginx',
+  before   => Exec['add_header'],
+}
+
+exec { 'add_header':
+  provider    => shell,
+  environment => ["HOST=${hostname}"],
+  command     => 'sudo sed -i "s/include \/etc\/nginx\/sites-enabled\/\*;/include \/etc\/nginx\/sites-enabled\/\*;\n\tadd_header X-Served-By \"$HOST\";/" /etc/nginx/nginx.conf',
+  before      => Exec['restart Nginx'],
+}
+
+exec {'restart Nginx':
+  provider => shell,
+  command  => 'sudo service nginx restart',
 }
