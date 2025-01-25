@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # This script configures an Ubuntu server to ensure Nginx is running and listening on port 80 of all active IPv4 IPs
+sudo service apache2 stop
+
 apt-get update
 apt-get install -y nginx
-sudo service apache2 stop
 
 sudo service nginx start
