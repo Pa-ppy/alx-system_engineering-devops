@@ -2,7 +2,6 @@
 # This script configures an Ubuntu server to ensure Nginx is running and listening on port 80 of all active IPv4 IPs
 sudo service apache2 stop
 
-sudo sed -i 's/listen 80 default_server;/listen 0.0.0.0:80 default_server;/' /etc/nginx/sites-enabled/default
-sudo sed -i 's/listen \[::\]:80 default_server;/listen [::]:80 default_server;/' /etc/nginx/sites-enabled/default
+sudo sed -i "s/sites-enabled/sites-available/" /etc/nginx/nginx.conf
 
 sudo service nginx start
