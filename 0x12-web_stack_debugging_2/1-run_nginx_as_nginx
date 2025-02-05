@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# This script starts nginx as a nginx user
+
+sed -i "s/^user .*user nginx;/g" /etc/nginx/nginx.conf
+sed -i "s/listen 80; /listen 8080;/g" /etc/nginx/sites-available
+
+systemctl restart nginx
