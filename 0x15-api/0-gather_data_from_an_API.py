@@ -1,7 +1,5 @@
 #!/usr/bin/python3
-"""
-Fetches and displays the TODO list progress of an employee using a REST API.
-"""
+"""Fetches and displays an employee's TODO list progress."""
 import requests
 import sys
 
@@ -16,16 +14,15 @@ if __name__ == "__main__":
     user_data = requests.get(user_url).json()
     employee_name = user_data.get("name")
 
-    todos_url = f"https://jsonplaceholder.typicode.com/todos?\
-            userId={employee_id}"
+    todos_url = (
+            f"https://jsonplaceholder.typicode.com/todos?userId={employee_id}"
+            )
     todos_data = requests.get(todos_url).json()
 
-    completed_tasks = [task["title"] for task in todos_data
+    completed_tasks = [task.get("title") for task in todos_data
                        if task.get("completed")]
-    total_tasks = len(todos_data)
-    done_tasks = len(completed_tasks)
 
-    print(f"Employee {employee_name} is done with tasks\
-            ({done_tasks}/{total_tasks}):")
+    print(f"Employee {employee_name} is done with tasks"
+          f"({len(completed_tasks)}/{len(todos_data)}):")
     for task in completed_tasks:
         print(f"\t {task}")
