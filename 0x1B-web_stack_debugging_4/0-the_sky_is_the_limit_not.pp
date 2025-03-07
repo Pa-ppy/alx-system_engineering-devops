@@ -1,41 +1,29 @@
-# This Puppet manifest adjusts the Nginx web stack to handle 2000 requests with 100 concurrent requests without failures.
+# This Puppet manifest fixes the issue of high failed requests by adjusting Nginx configuration and increasing file descriptor limits.
 
-# Increase file descriptor limits system-wide
-file { '/etc/security/limits.conf':
-    ensure  => present,
-    content => "
-* soft nofile 65536
-* hard nofile 65536
-",
-    notify  => Exec['reload-pam-limits'],
+# Increase the file descriptor limit for Nginx
+exec { 'increase-nginx-ulimit':
+  provider => shell,
+  command  => 'sed -i "s/ULIMIT=\"-n [0-9]*\"/ULIMIT=\"-n 4096\"/" /etc/default/nginx',
+  unless   => 'grep -q "ULIMIT=\"-n 4096\"" /etc/default/nginx',
 }
 
-# Reload PAM limits to apply changes
+# Restart Nginx to apply the new ULIMIT setting
+exec { 'restart-nginx':
+  provider => shell,
+  command  => 'service nginx restart',
+  require  => Exec['increase-nginx-ulimit'],
+}
+
+# Increase system-wide file descriptor limits
+exec { 'increase-system-ulimit':
+  provider => shell,
+  command  => 'echo "* soft nofile 65536" >> /etc/security/limits.conf && echo "* hard nofile 65536" >> /etc/security/limits.conf',
+  unless   => 'grep -q "* soft nofile 65536" /etc/security/limits.conf',
+}
+
+# Reload PAM limits to apply system-wide changes
 exec { 'reload-pam-limits':
-    command     => 'pam_limits.so',
-    path        => '/usr/lib/x86_64-linux-gnu/security/',
-    refreshonly => true,
-}
-
-# Update Nginx configuration to handle more concurrent connections
-file { '/etc/nginx/nginx.conf':
-    ensure  => present,
-    content => "
-events {
-    worker_connections 4096;
-}
-
-http {
-    client_body_buffer_size 10K;
-    proxy_buffer_size 128k;
-    error_log /var/log/nginx/error.log debug;
-}
-",
-    notify  => Service['nginx'],
-}
-
-# Ensure Nginx service is running and enabled
-service { 'nginx':
-    ensure => running,
-    enable => true,
+  provider => shell,
+  command  => 'sysctl -p',
+  require  => Exec['increase-system-ulimit'],
 }
