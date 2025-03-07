@@ -1,19 +1,20 @@
 # This Puppet manifest increases the file descriptor limit for Nginx
 
-exec { 'increase-nginx-ulimit':
-  provider => shell,
-  command  => 'sed -i "s/ULIMIT=\"-n [0-9]*\"/ULIMIT=\"-n 4096\"/" /etc/default/nginx',
-  unless   => 'grep -q "ULIMIT=\"-n 4096\"" /etc/default/nginx',
+# Increase the nginx limit
+exec { 'increase_nginx_ulimit':
+  command  => "sed -i 's/ULIMIT=\"-n 15\"/ULIMIT=\"-n 4096\"/g' /etc/default/nginx",
+  path => ['/bin', '/usr/bin', '/sbin', '/usr/sbin'],
 }
 
-exec { 'stop-nginx':
-  provider => shell,
+# Stop nginx from running
+exec { 'stop_nginx':
   command  => 'service nginx stop',
-  require  => Exec['increase-nginx-ulimit'],
+  path => ['/bin', '/usr/bin', '/sbin', '/usr/sbin'],
 }
 
-exec { 'start-nginx':
-  provider => shell,
+# Start the nginx process
+exec { 'start_nginx':
   command  => 'service nginx start',
-  require  => Exec['stop-nginx'],
+  path => ['/bin', '/usr/bin', '/sbin', '/usr/sbin'],
+  require  => Exec['stop_nginx'],
 }
