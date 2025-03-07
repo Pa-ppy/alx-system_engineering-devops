@@ -1,4 +1,4 @@
-# This Puppet manifest adjusts the web stack (Nginx) to handle 1000 requests with 100 concurrent requests without failures.
+# This Puppet manifest adjusts the Nginx web stack to handle 2000 requests with 100 concurrent requests without failures.
 
 # Increase file descriptor limits system-wide
 file { '/etc/security/limits.conf':
