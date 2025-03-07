@@ -1,6 +1,5 @@
-# This Puppet manifest fixes Nginx configuration to handle high traffic and reduce failed requests.
+# This Puppet manifest fixes the Nginx configuration to handle high traffic and reduce failed requests.
 
-# Adjust file descriptor limits
 file { '/etc/security/limits.conf':
     ensure  => present,
     content => "
@@ -16,15 +15,11 @@ exec { 'reload-pam-limits':
     refreshonly => true,
 }
 
-# Update Nginx configuration
 file { '/etc/nginx/nginx.conf':
     ensure  => present,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0644',
     content => "
 events {
-    worker_connections 1024;
+    worker_connections 4096;
 }
 
 http {
@@ -36,7 +31,6 @@ http {
     notify  => Service['nginx'],
 }
 
-# Ensure Nginx service is running
 service { 'nginx':
     ensure => running,
     enable => true,
