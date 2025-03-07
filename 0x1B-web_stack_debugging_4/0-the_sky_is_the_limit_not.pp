@@ -1,5 +1,6 @@
-# This Puppet manifest fixes the Nginx configuration to handle high traffic and reduce failed requests.
+# This Puppet manifest adjusts the web stack (Nginx) to handle 1000 requests with 100 concurrent requests without failures.
 
+# Increase file descriptor limits system-wide
 file { '/etc/security/limits.conf':
     ensure  => present,
     content => "
@@ -9,12 +10,14 @@ file { '/etc/security/limits.conf':
     notify  => Exec['reload-pam-limits'],
 }
 
+# Reload PAM limits to apply changes
 exec { 'reload-pam-limits':
     command     => 'pam_limits.so',
     path        => '/usr/lib/x86_64-linux-gnu/security/',
     refreshonly => true,
 }
 
+# Update Nginx configuration to handle more concurrent connections
 file { '/etc/nginx/nginx.conf':
     ensure  => present,
     content => "
@@ -31,6 +34,7 @@ http {
     notify  => Service['nginx'],
 }
 
+# Ensure Nginx service is running and enabled
 service { 'nginx':
     ensure => running,
     enable => true,
